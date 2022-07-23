@@ -72,7 +72,7 @@ func readMessage(msg string) (string, map[string]interface{}) {
 // handle an 'init' message and print an appropriate response
 func handleInit(parsed map[string]interface{}, node *Node) {
 	nodeId, e1 := PickValue[string](parsed, "body", "node_id")
-	// int values are stored as float64's in JSON
+	// JSON numbers are stored as float64
 	msgId, e2 := PickValue[float64](parsed, "body", "msg_id")
 	src, e3 := PickValue[string](parsed, "src")
 	if e1 != nil || e2 != nil || e3 != nil {
