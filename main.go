@@ -39,43 +39,38 @@ func main() {
 	var node Node
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		rawLine, err := reader.ReadString('\n')
+		line, err := reader.ReadString('\n')
 		if err == io.EOF {
 			break
 		}
-		line := strings.TrimSpace(rawLine)
-		msgtype := messageType(line)
+		msgtype, msg := readMessage(strings.TrimSpace(line))
 		switch msgtype {
 		case "init":
-			handleInit(line, &node)
+			handleInit(msg, &node)
 		case "echo":
-			handleEcho(line, &node)
+			handleEcho(msg, &node)
 		default:
 			fmt.Fprintf(os.Stderr, "unknown message type: %v\n", msgtype)
 		}
 	}
 }
 
-func messageType(msg string) string {
+func readMessage(msg string) (string, map[string]interface{}) {
 	parsed, err := UnmarshalJson(msg)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not parse JSON: %v\n", err)
-		return "unknown"
+		return "unknown", nil
 	}
 	msgtype, err := ParseJson[string](parsed, "body", "type")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not determine message type: %v\n", err)
-		return "unknown"
+		return "unknown", nil
 	}
-	return msgtype
+	return msgtype, parsed
 }
 
 // handle an 'init' message and print an appropriate response
-func handleInit(msg string, node *Node) {
-	parsed, err := UnmarshalJson(msg)
-	if err != nil {
-		return
-	}
+func handleInit(parsed map[string]interface{}, node *Node) {
 	nodeId, e1 := ParseJson[string](parsed, "body", "node_id")
 	// int values are stored as float64's in JSON
 	msgId, e2 := ParseJson[float64](parsed, "body", "msg_id")
@@ -103,11 +98,7 @@ func handleInit(msg string, node *Node) {
 }
 
 // handle an 'echo' message and print an appropriate response
-func handleEcho(msg string, node *Node) {
-	parsed, err := UnmarshalJson(msg)
-	if err != nil {
-		return
-	}
+func handleEcho(parsed map[string]interface{}, node *Node) {
 	message, e1 := ParseJson[string](parsed, "body", "echo")
 	msgId, e2 := ParseJson[float64](parsed, "body", "msg_id")
 	src, e3 := ParseJson[string](parsed, "src")
