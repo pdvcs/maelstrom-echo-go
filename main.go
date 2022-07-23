@@ -59,13 +59,15 @@ func main() {
 func messageType(msg string) string {
 	parsed, err := UnmarshalJson(msg)
 	if err != nil {
-		return err.Error()
+		fmt.Fprintf(os.Stderr, "could not parse JSON: %v\n", err)
+		return "unknown"
 	}
 	msgtype, err := ParseJson[string](parsed, "body", "type")
-	if err == nil {
-		return msgtype
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not determine message type: %v\n", err)
+		return "unknown"
 	}
-	return err.Error()
+	return msgtype
 }
 
 // handle an 'init' message and print an appropriate response
