@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func parseBase(json map[string]interface{}, fields ...string) (map[string]interface{}, error) {
+func pick(json map[string]interface{}, fields ...string) (map[string]interface{}, error) {
 	for i := 0; i < len(fields)-1; i++ {
 		t, ok := json[fields[i]].(map[string]interface{})
 		if !ok {
@@ -16,10 +16,10 @@ func parseBase(json map[string]interface{}, fields ...string) (map[string]interf
 	return json, nil
 }
 
-func ParseJson[T any](json map[string]interface{}, fields ...string) (T, error) {
+func PickValue[T any](json map[string]interface{}, fields ...string) (T, error) {
 	var defvalue T
 	if len(fields) > 1 {
-		t, err := parseBase(json, fields...)
+		t, err := pick(json, fields...)
 		if err != nil {
 			return defvalue, err
 		}

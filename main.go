@@ -61,7 +61,7 @@ func readMessage(msg string) (string, map[string]interface{}) {
 		fmt.Fprintf(os.Stderr, "could not parse JSON: %v\n", err)
 		return "unknown", nil
 	}
-	msgtype, err := ParseJson[string](parsed, "body", "type")
+	msgtype, err := PickValue[string](parsed, "body", "type")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not determine message type: %v\n", err)
 		return "unknown", nil
@@ -71,10 +71,10 @@ func readMessage(msg string) (string, map[string]interface{}) {
 
 // handle an 'init' message and print an appropriate response
 func handleInit(parsed map[string]interface{}, node *Node) {
-	nodeId, e1 := ParseJson[string](parsed, "body", "node_id")
+	nodeId, e1 := PickValue[string](parsed, "body", "node_id")
 	// int values are stored as float64's in JSON
-	msgId, e2 := ParseJson[float64](parsed, "body", "msg_id")
-	src, e3 := ParseJson[string](parsed, "src")
+	msgId, e2 := PickValue[float64](parsed, "body", "msg_id")
+	src, e3 := PickValue[string](parsed, "src")
 	if e1 != nil || e2 != nil || e3 != nil {
 		fmt.Fprintf(os.Stderr, "error picking values from JSON\n")
 		return
@@ -99,9 +99,9 @@ func handleInit(parsed map[string]interface{}, node *Node) {
 
 // handle an 'echo' message and print an appropriate response
 func handleEcho(parsed map[string]interface{}, node *Node) {
-	message, e1 := ParseJson[string](parsed, "body", "echo")
-	msgId, e2 := ParseJson[float64](parsed, "body", "msg_id")
-	src, e3 := ParseJson[string](parsed, "src")
+	message, e1 := PickValue[string](parsed, "body", "echo")
+	msgId, e2 := PickValue[float64](parsed, "body", "msg_id")
+	src, e3 := PickValue[string](parsed, "src")
 	if e1 != nil || e2 != nil || e3 != nil {
 		fmt.Fprintf(os.Stderr, "error picking values from JSON\n")
 		return
