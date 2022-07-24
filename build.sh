@@ -2,7 +2,7 @@
 set -e
 
 export ARG="$1"
-[[ "$ARG" == "" ]] && export ARG="build"
+[[ -z "$ARG" ]] && export ARG="build"
 
 case "$ARG" in
     build)
